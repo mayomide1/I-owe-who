@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Who Owes Who</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css"
+    />
+</head>
+<body>
+    <header class="app-header">
+        <h1>Who Owes Who</h1>
+    </header>
+
+    <main class="app-container">
+        <!-- People view -->
+        <section class="panel" id="people_panel">
+            <h2>People</h2>
+            <div class="add-person">
+                <input type="text" id="owners_name" placeholder="Enter name" />
+                <button id="add_person_btn">Add Person</button>
+            </div>
+            <div id="people_cards" class="people-list"></div>
+        </section>
+
+        <!-- Details view (hidden until a person is clicked) -->
+        <section class="panel hidden" id="details_panel">
+            <div class="details-header">
+                <button class="back-btn" id="back_btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+                </button>
+            </div>
+
+            <div id="person_cards" class="person-details"></div>
+
+            <div id="transactions_container" class="transactions-container">
+                <div id="transaction_input"></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
