@@ -9,15 +9,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/people", async (req, res) => {
-  try {
-    const person = await Person.find();
-    res.status(200).json(person);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 function calculateBalance(notifications) {
   return notifications.reduce((sum, n) => {
     const value = Number(n.amount) || 0;
@@ -26,6 +17,15 @@ function calculateBalance(notifications) {
     return sum;
   }, 0);
 }
+
+app.get("/people", async (req, res) => {
+  try {
+    const person = await Person.find();
+    res.status(200).json(person);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get("/people/:id", async (req, res) => {
   try {
