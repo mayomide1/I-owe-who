@@ -18,6 +18,25 @@ app.get("/people", async (req, res) => {
     }
 })
 
+function calculateBalance(notifications) {
+    return notifications.reduce((sum, n) => {
+        const value = Number(n.amount) || 0;
+        if (n.label === "received") return sum + value;
+        if (n.label === "sent")     return sum - value;
+        return sum;
+    }, 0);
+}
+
+app.get("/people/:id", async (req, res) => {
+    try{
+    const id = req.params.id
+    const person = await Person.findById(id)
+    res.status(200).json(person)
+    }catch(error){
+        res.status(500).json({error: error.message})
+    }
+})
+
 app.post("/people", async (req, res) => {
     try{
     const person = await Person.create({
@@ -31,18 +50,102 @@ app.post("/people", async (req, res) => {
 }
 })
 
+app.delete("/people/:id", async (req, res) => {
+    try{  
+        const person = await Person.findByIdAndDelete(req.params.id)
+        res.status(200).json({message: "User Deleted"})
+
+    }catch(error){
+        res.status(400).json({error: error.message})
+    }
+})
+
+app.get("/transactions/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const person = await Person.findById(id);
+    if (!person) {
+      return res.status(404).json({ message: "No user found!" });
+    }
+    res.status(200).json(person);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post("/transactions/:id", async (req, res) => {
+    try{
+    const {amount, note, label} = req.body
+    const id = req.params.id
+    const person = await Person.findById(id)
+
+       if(!person) { 
+        return res.status(400).json({message: "No user found!"})
+       }
+
+        person.notifications.push({
+            amount: amount.trim(),
+            note: note.trim(),
+            label: label.toLowerCase(),
+            date: new Date().toLocaleDateString('en-CA'),
+        })
+
+    person.amount = calculateBalance(person.notifications);
+
+    await person.save()
+       
+    res.status(200).json(person)
+       
+    }catch(error){
+        res.status(500).json({error: error.message})
+    }
+})
+
+app.delete("/people/:personId/notifications/:notificationId", async (req, res) => {
+    try {
+        const { personId, notificationId } = req.params;
+
+        const person = await Person.findById(personId);
+        if (!person) {
+            return res.status(404).json({ message: "No user found!" });
+        }
+
+        const notif = person.notifications.id(notificationId);
+        if (!notif) {
+            return res.status(404).json({ message: "Notification not found!" });
+        }
+
+        notif.deleteOne();
+
+        person.amount = calculateBalance(person.notifications);
+        await person.save();
+
+        res.status(200).json(person);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 app.put("/people/:id", async (req, res) => {
     try{
-    const {name, amount} = req.body
-
-       const person = await Person.findById(req.params.id)
+    const {amount, note, label} = req.body
+    const id = req.params.id
+       const person = await Person.findById(id)
 
        if(!person) { 
         res.status(400).json({message: "No user found!"})
        }
 
-    if (name !== undefined) person.name = name
-    if (amount !== undefined) person.amount = amount
+    if (id !== undefined){
+        person.notifications = {
+            id: new Date(),
+            amount: amount,
+            note: note,
+            label: label,
+            date: new Date().toLocaleDateString('en-CA'),
+        }
+    }
 
     await person.save()
        
@@ -54,15 +157,7 @@ app.put("/people/:id", async (req, res) => {
 })
 
 
-app.delete("/people/:id", async (req, res) => {
-    try{  
-        const person = await Person.findByIdAndDelete(req.params.id)
-        res.status(200).json({message: "User Deleted"})
 
-    }catch(error){
-        res.status(400).json({error: error.message})
-    }
-})
 
 PORT = process.env.PORT || 5000
 
