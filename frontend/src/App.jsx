@@ -61,7 +61,7 @@ const App = () => {
 
   async function renderNotification(id) {
     try {
-      const response = await axios.get(`${url}/transactions/${id}`);
+      const response = await axios.get(`${url}/people/${id}/notifications`);
       setSelectedPerson(response.data)
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -75,14 +75,25 @@ const App = () => {
         return;
       }
       const payload = { amount: amount, note: note, label: label };
-      await axios.post(`${url}/transactions/${id}`, payload);
-      await renderNotification(id);
-      renderPeople();
+      await axios.post(`${url}/people/${id}/notifications`, payload);
       alert("Saved successfully")
+      await renderNotification(id);
+      await renderPeople();
+      setOpenInput(false)
       setAmount("");
       setNote("");
       setLabel("");
     } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
+  }
+
+  async function deleteNotification(personId, notificationId){
+    try{
+      await axios.delete(`${url}/people/${personId}/notifications/${notificationId}`)
+      await renderNotification(personId);
+      await renderPeople();
+    }catch(error){
       console.error("Error fetching data:", error.message);
     }
   }
@@ -238,6 +249,7 @@ const App = () => {
                       {notif.label.slice(0, 1).toUpperCase()}
                       {notif.label.slice(1)}
                     </h3>
+                    <p className="history-date">{notif.note}</p>
                     <p className="history-date">{notif.date}</p>
                   </div>
                   <div className="history-right">
@@ -246,7 +258,7 @@ const App = () => {
                     </h3>
                     <div className="history-actions">
                       <button className="btn btn-sm btn-secondary"><MdEdit />Edit</button>
-                      <button className="btn btn-sm btn-danger"><MdDelete  />Delete</button>
+                      <button className="btn btn-sm btn-danger" onClick={() => deleteNotification(selectedPerson._id, notif._id)}><MdDelete  />Delete</button>
                     </div>
                   </div>
                 </div>

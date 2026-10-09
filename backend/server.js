@@ -60,7 +60,7 @@ app.delete("/people/:id", async (req, res) => {
     }
 })
 
-app.get("/transactions/:id", async (req, res) => {
+app.get("/people/:id/notifications", async (req, res) => {
   try {
     const id = req.params.id;
     const person = await Person.findById(id);
@@ -73,7 +73,7 @@ app.get("/transactions/:id", async (req, res) => {
   }
 });
 
-app.post("/transactions/:id", async (req, res) => {
+app.post("/people/:id/notifications", async (req, res) => {
     try{
     const {amount, note, label} = req.body
     const id = req.params.id
