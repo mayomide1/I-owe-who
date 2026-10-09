@@ -15,7 +15,7 @@ const App = () => {
   const [note, setNote] = useState("");
   const [editingId, setEditingId] = useState(null);
 
-  const url = import.meta.env.VITE_API_URL;
+  const url = import.meta.env.VITE_API_URL || "https://i-owe-who.onrender.com";
 
   async function renderPeople() {
     try {
